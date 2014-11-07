@@ -5,6 +5,37 @@
  * useful for chinese users, and maybe for i11n users.
  * All rights reserved by anphorea@gmail.com, obtain an email confirmation before you copy it.
  */
+#ifndef SERVICE_H_
+#define SERVICE_H_
+
+#include <QObject>
+#include <bb/system/phone/Call>
+#include <bb/system/phone/Phone>
+#include <bb/pim/contacts/ContactService>
+
+namespace bb
+{
+    class Application;
+}
+
+class Service: public QObject
+{
+    Q_OBJECT
+public:
+    Service();
+    virtual ~Service()
+    {
+    }
+private Q_SLOT:
+    void onCallUpdated(bb::system::phone::Call& call);
+    void deleteTempAccount(const bb::pim::contacts::Contact& tc);
+private:
+    bb::system::phone::Phone phone;
+
+};
+
+#endif /* SERVICE_H_ */
+
 
 #include "service.hpp"
 #include <QObject>
@@ -27,7 +58,7 @@ Service::Service() :
         QObject()
 {
     bool success = QObject::connect(phone, SIGNAL(callUpdated(bb::system::phone::Call&)), this,
-            SLOT(onCallUpdated(const Call)));
+            SLOT(onCallUpdated(bb::system::phone::Call&)));
 
     if (success) {
         // Signal was successfully connected.
@@ -42,7 +73,7 @@ Service::Service() :
     }
 }
 
-void Service::onCallUpdated(const Call call)
+void Service::onCallUpdated(bb::system::phone::Call& call)
 {
     CallState::Type state = call.callState();
     qDebug() << "call updated: callId=" << call.callId() << " callState=" << state;
@@ -101,3 +132,4 @@ void Service::deleteTempAccount(const bb::pim::contacts::Contact& tc)
 {
     bb::pim::contacts::ContactService().deleteContact(tc.accountId());
 }
+
