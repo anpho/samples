@@ -4,7 +4,7 @@
  * This is an idea to provide incoming/outgoing call number location on phone UI,
  * useful for chinese users, and maybe for i11n users.
  * All rights reserved by anphorea@gmail.com, obtain an email confirmation before you copy it.
- * /
+ */
 
 #include "service.hpp"
 #include <QObject>
