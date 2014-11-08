@@ -10,8 +10,7 @@ All codes are written by me and are under MIT license by default.
 a simple wrapper to convert passport touchable keyboard events to up/down/left/right directions.
 
 Tips:
-
-What about add some move distance limit?
+>What about add some move distance limit?
 
 ### [Modify contact info while call incoming](https://github.com/anpho/samples/blob/master/CallerLocation.cpp)
 
@@ -21,8 +20,7 @@ Note:
 >When the phone is ringing, onCallUpdated slot is triggered several times, this service modifies the contact information at the first time when phoneNumber is available, and the PhoneUI will update the information at next trigger.
 
 Tips:
-
-Create a new contact for unknown incoming number, and delete that contact after the phone hanged up.
+>Create a new contact for unknown incoming number, and delete that contact after the phone hanged up.
 
 
 
