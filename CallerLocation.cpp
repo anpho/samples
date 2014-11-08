@@ -1,10 +1,13 @@
-//Unfinished.
+//Working.
 
 /*
  * This is an idea to provide incoming/outgoing call number location on phone UI,
  * useful for chinese users, and maybe for i11n users.
  * All rights reserved by anphorea@gmail.com, obtain an email confirmation before you copy it.
  */
+
+// ================== HEADER ====================
+
 #ifndef SERVICE_H_
 #define SERVICE_H_
 
@@ -26,15 +29,18 @@ public:
     virtual ~Service()
     {
     }
-private Q_SLOT:
-    void onCallUpdated(bb::system::phone::Call& call);
-    void deleteTempAccount(const bb::pim::contacts::Contact& tc);
+private slots:
+    void onCallUpdated(const bb::system::phone::Call &call);
+    void deleteTempAccount();
 private:
-    bb::system::phone::Phone phone;
-
+    bb::system::phone::Phone* phone;
+    bb::pim::contacts::Contact createdContact;
+    bb::pim::contacts::Contact originalContact;
 };
 
 #endif /* SERVICE_H_ */
+
+//============================ BODY =============================
 
 
 #include "service.hpp"
@@ -57,8 +63,9 @@ using namespace bb::pim::contacts;
 Service::Service() :
         QObject()
 {
-    bool success = QObject::connect(phone, SIGNAL(callUpdated(bb::system::phone::Call&)), this,
-            SLOT(onCallUpdated(bb::system::phone::Call&)));
+    phone = new bb::system::phone::Phone();
+    bool success = connect(phone, SIGNAL(callUpdated(const bb::system::phone::Call&)), this,
+            SLOT(onCallUpdated(const bb::system::phone::Call&)));
 
     if (success) {
         // Signal was successfully connected.
@@ -73,13 +80,13 @@ Service::Service() :
     }
 }
 
-void Service::onCallUpdated(bb::system::phone::Call& call)
+void Service::onCallUpdated(const bb::system::phone::Call &call)
 {
     CallState::Type state = call.callState();
     qDebug() << "call updated: callId=" << call.callId() << " callState=" << state;
     qDebug() << "Number is : " << call.phoneNumber();
 
-    if (bb::system::phone::CallState::Incoming == state) {
+    if (bb::system::phone::CallState::Incoming == state && call.phoneNumber().length() > 0) {
         qDebug() << "call incoming, Searching for contacts.";
 
         ContactSearchFilters filters;
@@ -89,47 +96,47 @@ void Service::onCallUpdated(bb::system::phone::Call& call)
         if (contactList.size() > 0) {
             //found contact, modify it's location info
             Contact m = contactList.at(0);
-            qDebug() << "Contact Found : " << m.displayName();
 
-            QList<ContactAttribute> phonelist = m.filteredAttributes(AttributeKind::Phone);
-            foreach (const ContactAttribute &pattr, phonelist){
-            if (pattr.value().compare(call.phoneNumber())==0) {
-                ContactBuilder ccb=m.edit();
-                QString originalName=pattr.label();
-                QString originalValue=pattr.value();
-                ccb.deleteAttribute(pattr);
-                ccb.addAttribute(ContactAttributeBuilder().setKind(AttributeKind::Phone)
-                        .setLabel(tr("anpho.test"))
-                        .setValue(originalValue));
-                qDebug()<<"Information Modified.";
+            m = bb::pim::contacts::ContactService().contactDetails(m.id());
+            qDebug() << "Contact Found : " << m.displayName();
+            originalContact = m; // save original contact info.
+            qDebug() << "Modifing Contact";
+
+            QList<ContactAttribute> namelist = m.filteredAttributes(AttributeKind::Name);
+            bool changed = false;
+            foreach (const ContactAttribute &pattr, namelist ){
+            if (pattr.subKind() == AttributeSubKind::NameSuffix) {
+                if (pattr.value().contains("(")) {
+                    qDebug() << "Already modified";
+                    changed=true;
+                } else {
+                    QString v=pattr.value();
+                    m.edit().addAttribute(ContactAttributeBuilder()
+                            .setKind(AttributeKind::Name)
+                            .setSubKind(AttributeSubKind::NameSuffix)
+                            .setValue("(" + tr("TEST") + ")"));
+                    changed=true;
+                }
                 break;
             }
-            bb::pim::contacts::ContactService().updateContact(m);
-            qDebug()<<"Contact Updated.";
         }
-    } else {
-        qDebug()<<"Incoming call not found in Contacts.";
+            if (!changed) {
+                m.edit().addAttribute(
+                        ContactAttributeBuilder().setKind(AttributeKind::Name).setSubKind(
+                                AttributeSubKind::NameSuffix).setValue("(" + tr("TEST") + ")"));
+            // use Suffix, or Prefix if user like.
+                changed = true;
+            }
 
-        bb::pim::contacts::ContactBuilder cb;
-        cb.addAttribute(ContactAttributeBuilder()
-                .setKind(AttributeKind::Phone)
-                .setSubKind(AttributeSubKind::PhoneMobile)
-                .setLabel(tr("anpho.testElse"))
-                .setValue(call.phoneNumber()));
-        cb.addAttribute(ContactAttributeBuilder()
-                .setKind(AttributeKind::Name)
-                .setValue(tr("Unknown")));
-        Contact createdContact =bb::pim::contacts::ContactService().createContact(cb,false);
-        qDebug()<<"Adding Fake Contact";
-        QTimer::singleShot(5000, this, SLOT(deleteTempAccount(createdContact)));
+            qDebug() << "Information Modified.";
+            bb::pim::contacts::ContactService().updateContact(m);
+        }
     }
     // Do something with this call now that you know
     // that it is connected and active.
 }
-}
 
-void Service::deleteTempAccount(const bb::pim::contacts::Contact& tc)
+void Service::deleteTempAccount()
 {
-    bb::pim::contacts::ContactService().deleteContact(tc.accountId());
+    bb::pim::contacts::ContactService().deleteContact(createdContact.id());
 }
-
