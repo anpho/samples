@@ -31,7 +31,7 @@ function dataURItoFile(dataURI, callback) {
 					console.log('write end')
 					var fp=fe.toURL();
 					//change to file:// protocol.
-					callback("file://"+fp.substr(fp.indexOf('/accounts/'));
+					callback("file://"+fp.substr(fp.indexOf('/accounts/')));
 				}
 				fw.write(bb);
 			}, function(e) {
