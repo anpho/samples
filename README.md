@@ -5,7 +5,7 @@ I share some sample codes here.
 
 All codes are written by me and are under MIT license by default.
 
-### [passportKeyboardEventWrapper](https://github.com/anpho/samples/blob/master/passportKeyboardEventWrapper.js)
+### [passport Keyboard Event Wrapper](https://github.com/anpho/samples/blob/master/passportKeyboardEventWrapper.js)
 
 a simple wrapper to convert passport touchable keyboard events to up/down/left/right directions.
 
@@ -21,6 +21,17 @@ Note:
 
 Tips:
 >Create a new contact for unknown incoming number, and delete that contact after the phone hanged up.
+
+### [dataURI to Local File](https://github.com/anpho/samples/blob/master/dataURItoLocalFile.js)
+
+This function is used for saving canvas dataURI to local file , which is useful in HTML5 client apps development. Just pass the dataURI string to this function and you'll get the local file path in callback, or null if anything bad happens.
+
+Tips:
+>This function uses TEMPORARY storage so that the browser may delete the generated files anytime it wishes.
+
+
+
+
 
 
 
