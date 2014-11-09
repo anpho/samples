@@ -1,3 +1,7 @@
+/*
+ *
+ * need to add com.blackberry.io plugin to your webworks project.
+ */
 function dataURItoFile(dataURI, callback) {
   // Convert dataURI to binary file content.
 	var byteString = atob(dataURI.split(',')[1]);
@@ -26,6 +30,7 @@ function dataURItoFile(dataURI, callback) {
 				fw.onwriteend = function() {
 					console.log('write end')
 					var fp=fe.toURL();
+					//change to file:// protocol.
 					callback("file://"+fp.substr(fp.indexOf('/accounts/'));
 				}
 				fw.write(bb);
