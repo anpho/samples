@@ -35,13 +35,13 @@ function touchKeyboardCallback(event) {
 		            if (Math.abs(dx)>Math.abs(dy)){
 			            if (dx>threshold){
 				            touchHandler("swiperight")
-			            }else{
+			            }else if (dx<-threshold){
 				            touchHandler("swipeleft")
 			            }
 		            }else{
 			            if (dy>threshold){
 				            touchHandler("swipedown")
-			            }else{
+			            }else if (dy<-threshold){
 				            touchHandler("swipeup")
 			            }
 		            }
