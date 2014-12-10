@@ -14,6 +14,8 @@ var touchHandler=function(event){
 
 var touchenabledkeyboardEvents={};
 
+var threshold=20;
+
 function touchKeyboardCallback(event) {
     event.touches.forEach(
         function (touch){
@@ -24,13 +26,13 @@ function touchKeyboardCallback(event) {
 		            var dx=touch.keyboardX - originalPoint.x;
 		            var dy=touch.keyboardY - originalPoint.y;
 		            if (Math.abs(dx)>Math.abs(dy)){
-			            if (dx>0){
+			            if (dx>threshold){
 				            touchHandler("swiperight")
 			            }else{
 				            touchHandler("swipeleft")
 			            }
 		            }else{
-			            if (dy>0){
+			            if (dy>threshold){
 				            touchHandler("swipedown")
 			            }else{
 				            touchHandler("swipeup")
