@@ -17,7 +17,7 @@ var touchenabledkeyboardEvents={};
 function touchKeyboardCallback(event) {
     event.touches.forEach(
         function (touch){
-            console.log(JSON.stringify(touch);
+            console.log(JSON.stringify(touch));
             if (touch.state=="TouchReleased"){
 	            var originalPoint=touchenabledkeyboardEvents[touch.identifier];
 	            if (originalPoint){
